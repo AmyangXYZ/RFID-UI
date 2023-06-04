@@ -6,7 +6,16 @@ const { records } = useRecords()
 <template>
   <vs-card>
     <template #header>
-      <h3>RFID Records</h3>
+      <vs-row>
+        <vs-col vs-w="4">
+          <h3>RFID Records</h3>
+        </vs-col>
+        <vs-col vs-offset="7.5" vs-w=".5">
+          <vs-button @click="records = []" color="primary" type="filled">Clear</vs-button>
+        </vs-col>
+      </vs-row>
+      
+      
     </template>
     <vs-table :key="records.length" :data="records" stripe>
       <template #thead>

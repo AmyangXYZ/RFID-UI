@@ -13,6 +13,7 @@
     "echarts": "^5.4.2",
     "material-icons": "^1.13.6",
     "vue": "^3.3.2",
+    "vue-router": "^4.2.2",
     "vuesax3": "^4.1.1"
   },
   "devDependencies": {
