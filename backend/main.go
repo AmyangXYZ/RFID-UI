@@ -20,6 +20,24 @@ var (
 	}
 )
 
+type RFIDDataRead struct {
+	AntennaRead []dataRead `json:"tag_reads"` //?
+}
+type dataRead struct {
+	Epc                string `json:"epc"`
+	AntennaPort        int    `json:"antennaPort"`
+	FirstSeenTimestamp int64  `json:"firstSeenTimeStamp"`
+}
+type TagInfo struct {
+	taginfoEPC         string
+	taginfoPort        []int
+	taginfoTimeStamp   []int64
+	taginfoAddPortFlag bool
+}
+
+var TagHolder = make(map[string]TagInfo)
+var distance float64 = 0.86 //unit m //frontend set distance
+
 func main() {
 
 	// register button in frontend send to backend
@@ -47,24 +65,6 @@ func main() {
 	app.GET("/ws", ws)
 	app.Run(":16311")
 }
-
-type RFIDDataRead struct {
-	AntennaRead []dataRead `json:"tag_reads"` //?
-}
-type dataRead struct {
-	Epc                string `json:"epc"`
-	AntennaPort        int    `json:"antennaPort"`
-	FirstSeenTimestamp int64  `json:"firstSeenTimeStamp"`
-}
-type TagInfo struct {
-	taginfoEPC         string
-	taginfoPort        []int
-	taginfoTimeStamp   []int64
-	taginfoAddPortFlag bool
-}
-
-var TagHolder = make(map[string]TagInfo)
-var distance float64 = 0.86 //unit m //frontend set distance
 
 func rxRFIDData(ctx *sgo.Context) error {
 	// json body request
