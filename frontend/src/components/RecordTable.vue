@@ -13,17 +13,24 @@ const columns = [
     width: 200,
     align: 'center'
   },
+  // {
+  //   key: 'antennaPort',
+  //   dataKey: 'antennaPort',
+  //   title: 'Antenna Port',
+  //   width: 200,
+  //   align: 'center'
+  // },
+  // {
+  //   key: 'timestamp',
+  //   dataKey: 'firstSeenTimeStamp',
+  //   title: 'Timestamp',
+  //   width: 200,
+  //   align: 'center'
+  // },
   {
-    key: 'antennaPort',
-    dataKey: 'antennaPort',
-    title: 'Antenna Port',
-    width: 200,
-    align: 'center'
-  },
-  {
-    key: 'timestamp',
-    dataKey: 'firstSeenTimeStamp',
-    title: 'Timestamp',
+    key: 'gaitSpeed',
+    dataKey: 'gaitSpeed',
+    title: 'Gait Speed (m/s)',
     width: 200,
     align: 'center'
   }

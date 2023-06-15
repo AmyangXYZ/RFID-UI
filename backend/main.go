@@ -20,6 +20,10 @@ var (
 	}
 )
 
+type DataServertoUI struct {
+	Epc      string  `json:"epc"`
+	CalSpeed float64 `json:"gaitSpeed"`
+}
 type RFIDDataRead struct {
 	AntennaRead []dataRead `json:"tag_reads"` //?
 }
@@ -37,7 +41,6 @@ type TagInfo struct {
 
 var TagHolder = make(map[string]TagInfo)
 var distance float64 = 0.86 //unit m //frontend set distance
-
 func main() {
 
 	// register button in frontend send to backend
@@ -153,16 +156,21 @@ func ws(ctx *sgo.Context) error {
 			}
 		}
 	}()
+
 	epc := 0
-	fmt.Println("dummy", epc)
+	speed := 0.01
 	for {
 		select {
 		case <-time.After(1 * time.Second):
 			//recond should be {epc speed} from rxRFIDData
-			// record := dataRead{epc, rand.Float64(), time.Now().Unix()}
-			// ws.WriteJSON(record)
-			// fmt.Println(record)
-			// epc++
+			// record := dataRead{"epc", epc, time.Now().Unix()}
+			record := DataServertoUI{"epc", speed}
+
+			ws.WriteJSON(record)
+			fmt.Println(record)
+			epc++
+			speed++
+
 		case <-breakSig:
 			return nil
 		}

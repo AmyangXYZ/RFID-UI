@@ -6,6 +6,7 @@ export function useRecord(): any {
   const { data } = useWebSocket('ws://localhost:16311/ws', { autoReconnect: { delay: 2000 } })
 
   watch(data, () => {
+    console.log("in useRecord, data print", data)
     records.value.push(JSON.parse(data.value))
   })
 
