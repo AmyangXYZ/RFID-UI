@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"strconv"
 	"time"
 )
 
@@ -50,9 +52,13 @@ func (tag *Tag) handleData() {
 				last := tag.TagTimeStamp[len(tag.TagTimeStamp)-1]
 				timeDiff := float64(last-first) / 1000000
 				speed := float64(distance / timeDiff)
+				speed = math.Round(speed*1000) / 1000
+				hour, min, sec := time.Now().Clock()
 
-				chDataToUI <- DataServertoUI{tag.InfoEPC, speed}
-				fmt.Println("speed:", tag.InfoEPC, speed, <-chDataToUI)
+				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+
+				chDataToUI <- DataServertoUI{tag.InfoEPC, speed, timeText}
+				fmt.Println("speed:", tag.InfoEPC, speed)
 				//send frontend "Red LED"
 
 				tag.TagPort = make([]int, 0)
@@ -61,7 +67,7 @@ func (tag *Tag) handleData() {
 				go func() {
 					time.Sleep(time.Duration(2*timeDiff) * time.Second)
 					tag.setAddFlag(true)
-					fmt.Println(tag.InfoEPC, "timer end")
+					fmt.Println(tag.InfoEPC, "timer end, ready to run")
 				}()
 
 			}

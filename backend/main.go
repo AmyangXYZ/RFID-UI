@@ -23,6 +23,7 @@ var (
 type DataServertoUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
+	Time     string  `json:"time"`
 }
 
 // reader to server
@@ -72,7 +73,7 @@ func main() {
 	fmt.Println("TagHolder", TagHolder)
 	app := sgo.New()
 	app.GET("/", func(ctx *sgo.Context) error {
-		return ctx.Text(200, "hello")
+		return ctx.Text(200, "hello123")
 	})
 
 	app.POST("/api/reader/connect", rxRFIDData) //retrive data from rfid reader
@@ -125,6 +126,7 @@ func rxRFIDData(ctx *sgo.Context) error {
 }
 
 func ws(ctx *sgo.Context) error {
+
 	ws, err := upgrader.Upgrade(ctx.Resp, ctx.Req, nil)
 	breakSig := make(chan bool)
 	if err != nil {
@@ -143,22 +145,10 @@ func ws(ctx *sgo.Context) error {
 		}
 	}()
 
-	// epc := 0
-	// speed := 0.01
 	for {
 		select {
-		// case <-time.After(1 * time.Second):
-		// 	//recond should be {epc speed} from rxRFIDData
-		// 	// record := DataTakeFromReader{"epc", epc, time.Now().Unix()}
-		// 	record := DataServertoUI{"epc", speed}
-
-		// 	ws.WriteJSON(record)
-		// 	fmt.Println(record)
-		// 	epc++
-		// 	speed++
 		case data := <-chDataToUI:
 			ws.WriteJSON(data)
-			fmt.Println("in ws function")
 
 		case <-breakSig:
 			return nil

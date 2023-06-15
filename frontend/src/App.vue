@@ -3,7 +3,7 @@ import PageHeader from './components/PageHeader.vue'
 import RecordTable from './components/RecordTable.vue'
 import TagHolder from './components/TagHolder.vue'
 import SideBarLeft from './components/SideBarLeft.vue'
-import SideBarRight from './components/SideBarRight.vue'
+// import SideBarRight from './components/SideBarRight.vue'
 </script>
 
 <template>

@@ -10,7 +10,7 @@ const columns = [
     key: 'epc',
     dataKey: 'epc',
     title: 'EPC',
-    width: 200,
+    width: 100,
     align: 'center'
   },
   // {
@@ -31,7 +31,14 @@ const columns = [
     key: 'gaitSpeed',
     dataKey: 'gait_speed',
     title: 'Gait Speed (m/s)',
-    width: 200,
+    width: 150,
+    align: 'center'
+  },
+  {
+    key: 'time',
+    dataKey: 'time',
+    title: 'Time',
+    width: 100,
     align: 'center'
   }
 ]
