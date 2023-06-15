@@ -29,7 +29,7 @@ const columns = [
   // },
   {
     key: 'gaitSpeed',
-    dataKey: 'gaitSpeed',
+    dataKey: 'gait_speed',
     title: 'Gait Speed (m/s)',
     width: 200,
     align: 'center'
