@@ -1,16 +1,10 @@
 @import './base.css';
 
 #app {
-  width: 100%;
-  /* max-width: 100%; */
   margin: 0 auto;
-  /* padding: 2rem; */
-  font-weight: normal;
-  margin-top: 80px;
-}
+  padding: 2rem;
 
-h3 {
-  font-weight: 500;
+  font-weight: normal;
 }
 
 a,
