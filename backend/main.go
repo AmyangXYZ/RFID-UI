@@ -20,9 +20,9 @@ var (
 	}
 )
 
-type DataServertoUI struct {
+type DataServertoUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
-	CalSpeed float64 `json:"gaitSpeed"`
+	CalSpeed float64 `json:"gait_speed"`
 }
 type RFIDDataRead struct {
 	AntennaRead []dataRead `json:"tag_reads"` //?
@@ -41,6 +41,8 @@ type TagInfo struct {
 
 var TagHolder = make(map[string]TagInfo)
 var distance float64 = 0.86 //unit m //frontend set distance
+var chDataToUI = make(chan DataServertoUI, 1024)
+
 func main() {
 
 	// register button in frontend send to backend
@@ -66,7 +68,7 @@ func main() {
 	app.POST("/connect", rxRFIDData) //retrive data from rfid reader
 
 	app.GET("/ws", ws)
-	app.Run(":16311")
+	app.Run(":16311") //block
 }
 
 func rxRFIDData(ctx *sgo.Context) error {
@@ -170,6 +172,8 @@ func ws(ctx *sgo.Context) error {
 			fmt.Println(record)
 			epc++
 			speed++
+		case data := <-chDataToUI:
+			ws.WriteJSON(data)
 
 		case <-breakSig:
 			return nil

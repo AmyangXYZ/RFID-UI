@@ -3,7 +3,8 @@ import { useWebSocket } from '@vueuse/core'
 
 export function useRecord(): any {
   const records = ref<any>([])
-  const { data } = useWebSocket('ws://localhost:16311/ws', { autoReconnect: { delay: 2000 } })
+  // const { data } = useWebSocket('ws://localhost:16311/ws', { autoReconnect: { delay: 2000 } })
+  const { data } = useWebSocket('ws://localhost:16311/ws')
 
   watch(data, () => {
     console.log("in useRecord, data print", data)
