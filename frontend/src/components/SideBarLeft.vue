@@ -35,6 +35,8 @@ const handleClose = (key: string, keyPath: string[]) => {
             :value="item.id"
           />
         </el-select>
+        
+  </div>
       </el-col>
       <el-col :span="6" style="vertical-align: center">
         <el-button size="small" :icon="Plus" @click="registerTag(selectedTagID)"> </el-button>

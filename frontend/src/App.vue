@@ -10,8 +10,9 @@ import SideBarLeft from './components/SideBarLeft.vue'
     <el-header><PageHeader /></el-header>
     <el-main>
       <el-row>
-        <el-col :span="4">
+        <el-col :span="6">
           <SideBarLeft />
+
         </el-col>
         <el-col :offset="2" :span="12">
           <RecordTable />
