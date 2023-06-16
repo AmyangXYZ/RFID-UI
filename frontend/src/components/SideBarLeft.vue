@@ -1,5 +1,19 @@
 <script setup lang="ts">
-import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+import { useTagHolder } from '../hooks/useTagHolder'
+
+const { registerTag } = useTagHolder()
+
+const selectableTagIDs = ref([
+  {
+    id: '00000945'
+  },
+  {
+    id: '18145536'
+  }
+])
+const selectedTagID = ref('')
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -10,32 +24,27 @@ const handleClose = (key: string, keyPath: string[]) => {
 </script>
 
 <template>
-  <el-menu default-active="2" class="side-bar" @open="handleOpen" @close="handleClose">
-    <el-sub-menu index="1">
-      <template #title>
-        <el-icon><location /></el-icon>
-        <span>Tag Register</span>
-      </template>
-      <el-menu-item-group title="Group One">
-        <el-menu-item index="1-1">item one</el-menu-item>
-        <el-menu-item index="1-2">item two</el-menu-item>
-      </el-menu-item-group>
-      <el-menu-item-group title="Group Two">
-        <el-menu-item index="1-3">item three</el-menu-item>
-      </el-menu-item-group>
-      <el-sub-menu index="1-4">
-        <template #title>item four</template>
-        <el-menu-item index="1-4-1">item one</el-menu-item>
-      </el-sub-menu>
-    </el-sub-menu>
-
-
-    
+  <el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
+    <el-row align="middle" justify="space-around"> 
+      <el-col :span="16">
+        <el-select v-model="selectedTagID" class="m-2" placeholder="Select">
+          <el-option
+            v-for="item in selectableTagIDs"
+            :key="item.id"
+            :label="item.id"
+            :value="item.id"
+          />
+        </el-select>
+      </el-col>
+      <el-col :span="6" style="vertical-align: center">
+        <el-button size="small" :icon="Plus" @click="registerTag(selectedTagID)"> </el-button>
+      </el-col>
+    </el-row>
   </el-menu>
 </template>
 
 <style scoped>
-.side-bar{
+.side-bar {
   height: 67vh;
 }
 </style>

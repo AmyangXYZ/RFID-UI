@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/AmyangXYZ/sgo"
+	"github.com/AmyangXYZ/sgo/middlewares"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,96 +19,56 @@ var (
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
+	TagHolder          = make(map[string]*Tag)
+	Distance   float64 = 0.86 //unit m
+	ChDataToUI         = make(chan DataServerToUI, 1024)
 )
 
 // UI to server
-type DataServertoUI struct { //go AaaBbb //json: zz_zz //
+type DataServerToUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
 	Time     string  `json:"time"`
 }
 
 // reader to server
-type DataTakeFromReader struct { //retrive data from RFID reader with format{epc  antennaport  firstseentime stamp}
+type RFIDData struct { //retrive data from RFID reader with format{epc  antennaport  firstseentime stamp}
 	Epc                string `json:"epc"`
 	AntennaPort        int    `json:"antennaPort"`
 	FirstSeenTimestamp int64  `json:"firstSeenTimeStamp"`
 }
 
 type RFIDDataFromReader struct {
-	TagReads []DataTakeFromReader `json:"tag_reads"` //?
+	TagReads []RFIDData `json:"tag_reads"` //?
 }
 
-// server to UI
-var (
-	TagHolder          = make(map[string]*Tag)
-	distance   float64 = 0.86 //unit m
-	chDataToUI         = make(chan DataServertoUI, 1024)
-)
-
-func newTag() *Tag { //? content in newtag??
-	return &Tag{
-		ChDataFromReader: make(chan RFIDDataFromReader, 1024),
-		ChSigBreak:       make(chan bool),
-		// sigReset
-		// sigPause
-		//
-	}
-}
 func main() {
 
-	// register button in frontend send to backend
-	UIButtonTagInputArray := []string{"00000945", "18145536"}
-
-	for _, UIButtonTagInput := range UIButtonTagInputArray {
-		tagName := "epc" + UIButtonTagInput
-		UIButtonTagInput24 := strings.Repeat("0", 24-len(UIButtonTagInput)) + UIButtonTagInput
-
-		tag := newTag()
-		// TagHolder[tag.id] = tag
-		// //send "grey LED" to frontend
-		TagHolder[UIButtonTagInput24] = tag
-		TagHolder[UIButtonTagInput24].setEPCName(tagName)
-		TagHolder[UIButtonTagInput24].setAddFlag(true)
-		go tag.handleData()
-	}
-	fmt.Println("TagHolder", TagHolder)
 	app := sgo.New()
+	app.USE(middlewares.CORS(middlewares.CORSOpt{}))
+
 	app.GET("/", func(ctx *sgo.Context) error {
 		return ctx.Text(200, "hello123")
 	})
 
-	app.POST("/api/reader/connect", rxRFIDData) //retrive data from rfid reader
+	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
 
-	app.GET("/ws", ws)
+	app.GET("/api/ui/tag", GetAllTags)                   // retrieve tag list (or tag holder)
+	app.POST("/api/ui/tag/:id", PostTag)                 // register a tag by name
+	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS
+	app.GET("/api/ui/ws", GetWebSocket)
 
-	// // /api/ui/1/true
-	// app.POST("/api/ui/:tag_id/:start_pause", pause)
-	// // app.GET("/ws", ws)
-
-	// app.POST("/api/ui/:tag_id", pause)              //
-	// app.DELETE("/api/ui/:tag_id", deleteTagHandler) //
-
-	// app.PUT("/api/ui/distance", updateDistance)
 	app.Run(":16311") //block
 }
 
-// func deleteTagHandler(ctx *sgo.Context) {
-// 	tag_id := ctx.Param("tag_id")                             //tag_id from UI is number only on physical tag
-// 	tag_id_24 := strings.Repeat("0", 24-len(tag_id)) + tag_id //the key of map is 24 digit
+func PutDistance(ctx *sgo.Context) error {
+	Distance, _ = strconv.ParseFloat(ctx.Param("distance"), 64)
+	return ctx.Text(200, fmt.Sprintf("current distance is %v", Distance))
+}
 
-// 	TagHolder[tag_id_24].ChSigBreak <- true
-// 	delete(TagHolder, tag_id_24) // remove from map tagHolder[tag_id_24]
-
-// }
-// func updateDistance(ctx *sgo.Context) error {
-// 	distance = ctx.Param("distance")
-// 	return err
-// }
-
-func rxRFIDData(ctx *sgo.Context) error {
+func PostFromReader(ctx *sgo.Context) error {
 	// json body request
-	body, err := ioutil.ReadAll(ctx.Req.Body)
+	body, err := io.ReadAll(ctx.Req.Body)
 	if err != nil {
 		return err
 	}
@@ -116,17 +78,32 @@ func rxRFIDData(ctx *sgo.Context) error {
 
 	readerEpcInput24 := data.TagReads[0].Epc
 	if _, ok := TagHolder[readerEpcInput24]; ok { //only pass data if key exist
-		if TagHolder[readerEpcInput24].TagAddPortFlag {
-			TagHolder[readerEpcInput24].ChDataFromReader <- data
-		}
+		// if TagHolder[readerEpcInput24].AddPortFlag  // each tag will check this flag itself
+		TagHolder[readerEpcInput24].ChDataFromReader <- data.TagReads[0]
 	} else {
 		fmt.Println("please register Tag")
 	}
 	return ctx.Text(200, "got it")
 }
 
-func ws(ctx *sgo.Context) error {
+func GetAllTags(ctx *sgo.Context) error {
+	return ctx.JSON(200, 1, "success", TagHolder)
+}
 
+func PostTag(ctx *sgo.Context) error {
+	// id = "00000945" or "18145536"
+	id := ctx.Param("id") // name must be in "epc{number}" format
+	fmt.Println(id)
+	id24 := strings.Repeat("0", 24-len(id)) + id
+	tag := newTag(id24)
+	TagHolder[id24] = tag
+	go tag.handleData()
+
+	fmt.Println("TagHolder", TagHolder)
+	return ctx.JSON(200, 1, "success", TagHolder)
+}
+
+func GetWebSocket(ctx *sgo.Context) error {
 	ws, err := upgrader.Upgrade(ctx.Resp, ctx.Req, nil)
 	breakSig := make(chan bool)
 	if err != nil {
@@ -147,7 +124,7 @@ func ws(ctx *sgo.Context) error {
 
 	for {
 		select {
-		case data := <-chDataToUI:
+		case data := <-ChDataToUI:
 			ws.WriteJSON(data)
 
 		case <-breakSig:

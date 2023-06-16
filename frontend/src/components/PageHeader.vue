@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import Logo from '@/assets/uconn-health-logo.png'
 
 const activeIndex = ref('1')
 const handleSelect = (key: string, keyPath: string[]) => {
@@ -15,7 +16,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
     :ellipsis="false"
     @select="handleSelect"
   >
-    <el-menu-item index="0">LOGO - UCONN HEALTH</el-menu-item>
+    <el-menu-item index="0"><img height="32" :src="Logo" /></el-menu-item>
     <div class="flex-grow" />
     <el-menu-item index="1">Processing Center</el-menu-item>
     <el-sub-menu index="2">
