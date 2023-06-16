@@ -22,9 +22,16 @@ var (
 	TagHolder          = make(map[string]*Tag)
 	Distance   float64 = 0.86 //unit m
 	ChDataToUI         = make(chan DataServerToUI, 1024)
+	ChLEDToUI          = make(chan LEDServerToUI, 1024)
 )
 
-// UI to server
+// sever to UI
+
+type LEDServerToUI struct { //go AaaBbb //json: zz_zz //
+	Epc string `json:"epc"`
+	Led string `json:"led"`
+}
+
 type DataServerToUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
@@ -55,10 +62,9 @@ func main() {
 
 	app.GET("/api/ui/tag", GetAllTags)                   // retrieve tag list (or tag holder)
 	app.POST("/api/ui/tag/:id", PostTag)                 // register a tag by name
-	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS
-	app.GET("/api/ui/ws", GetWebSocket)
-
-	app.Run(":16311") //block
+	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS??
+	app.GET("/api/ui/ws", GetWebSocket)                  // server data to UI
+	app.Run(":16311")                                    //block
 }
 
 func PutDistance(ctx *sgo.Context) error {
@@ -90,12 +96,14 @@ func GetAllTags(ctx *sgo.Context) error {
 	return ctx.JSON(200, 1, "success", TagHolder)
 }
 
-func PostTag(ctx *sgo.Context) error {
+func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 	// id = "00000945" or "18145536"
 	id := ctx.Param("id") // name must be in "epc{number}" format
 	fmt.Println(id)
 	id24 := strings.Repeat("0", 24-len(id)) + id
-	tag := newTag(id24)
+	epc := "epc" + id
+	tag := newTag(epc)
+	ChLEDToUI <- LEDServerToUI{epc, "grey"}
 	TagHolder[id24] = tag
 	go tag.handleData()
 
@@ -126,6 +134,8 @@ func GetWebSocket(ctx *sgo.Context) error {
 		select {
 		case data := <-ChDataToUI:
 			ws.WriteJSON(data)
+		// case data := <-ChLEDToUI:
+		// 	ws.WriteJSON(data)
 
 		case <-breakSig:
 			return nil

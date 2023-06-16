@@ -13,20 +13,7 @@ const columns = [
     width: 100,
     align: 'center'
   },
-  // {
-  //   key: 'antennaPort',
-  //   dataKey: 'antennaPort',
-  //   title: 'Antenna Port',
-  //   width: 200,
-  //   align: 'center'
-  // },
-  // {
-  //   key: 'timestamp',
-  //   dataKey: 'firstSeenTimeStamp',
-  //   title: 'Timestamp',
-  //   width: 200,
-  //   align: 'center'
-  // },
+
   {
     key: 'gaitSpeed',
     dataKey: 'gait_speed',

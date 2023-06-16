@@ -6,4 +6,9 @@ const { tags } = useTagHolder()
 
 <template>
   <div>Current Tags: {{ tags }}</div>
+  <div>Tags Status: </div>
+  
 </template>
+
+
+<!-- UI wating data from sever,  -->

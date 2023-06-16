@@ -10,19 +10,19 @@ import (
 type Tag struct {
 	ChDataFromReader chan RFIDData `json:"-"`
 	ChSigBreak       chan bool     `json:"-"` // use - to omit it when convert to JSON
-	ID24             string        `json:"id24"`
 	EPC              string        `json:"epc"`
 	Data             []RFIDData    `json:"data"`
 	AddPortFlag      bool          `json:"add_port_flag"`
+	// LED              string        `json:"led"`
 }
 
-func newTag(id24 string) *Tag {
+func newTag(epc string) *Tag {
 	return &Tag{
 		ChDataFromReader: make(chan RFIDData, 1024),
 		ChSigBreak:       make(chan bool),
-		ID24:             id24,
-		EPC:              "epc" + id24,
+		EPC:              epc,
 		AddPortFlag:      true,
+		// LED:              "GREY",
 	}
 }
 
@@ -39,12 +39,12 @@ func (tag *Tag) handleData() {
 		select {
 		case data := <-tag.ChDataFromReader:
 			if tag.AddPortFlag {
+				ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
 				tag.Data = append(tag.Data, data)
-				// tag.Ports = append(tag.Ports, postPort)
-				// tag.Timestamps = append(tag.Timestamps, postTime)
 				fmt.Println(tag.EPC, tag.Data)
 			}
 			if len(tag.countPortNumType()) > 1 {
+				ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
 				tag.AddPortFlag = false // no need a setter, since this attribute is public
 				timeRangeStart := tag.Data[0].FirstSeenTimestamp
 				timeRangeEnd := tag.Data[len(tag.Data)-1].FirstSeenTimestamp
