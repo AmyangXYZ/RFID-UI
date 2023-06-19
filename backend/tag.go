@@ -41,7 +41,7 @@ func (tag *Tag) handleData() {
 			if tag.AddPortFlag {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
 				tag.Data = append(tag.Data, data)
-				fmt.Println(tag.EPC, tag.Data)
+				// fmt.Println(tag.EPC, tag.Data)
 			}
 			if len(tag.countPortNumType()) > 1 {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}

@@ -80,7 +80,7 @@ func PostFromReader(ctx *sgo.Context) error {
 	}
 	var data RFIDDataFromReader // raw read struct
 	json.Unmarshal(body, &data)
-	// fmt.Println(data) //len could be 1 or 2 // use first one
+	fmt.Println(data) //len could be 1 or 2 // use first one
 
 	readerEpcInput24 := data.TagReads[0].Epc
 	if _, ok := TagHolder[readerEpcInput24]; ok { //only pass data if key exist
