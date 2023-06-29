@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/AmyangXYZ/sgo"
 	"github.com/AmyangXYZ/sgo/middlewares"
@@ -36,6 +37,7 @@ type DataServerToUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
 	Time     string  `json:"time"`
+	Led      string  `json:led`
 }
 
 // reader to server
@@ -129,11 +131,29 @@ func GetWebSocket(ctx *sgo.Context) error {
 			}
 		}
 	}()
-
+	count := 0
 	for {
 		select {
-		case data := <-ChDataToUI:
-			ws.WriteJSON(data)
+		// case data := <-ChDataToUI:
+		// 	ws.WriteJSON(data)
+
+		case <-time.After(1 * time.Second):
+			count++
+			if count%7 == 0 {
+
+				hour, min, sec := time.Now().Clock()
+				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+				data := DataServerToUI{"18145536", 22.22, timeText, "RED"}
+				ws.WriteJSON(data)
+
+			} else if count%3 == 0 {
+				data := LEDServerToUI{"18145536", "GREEN"}
+				ws.WriteJSON(data)
+			} else if count%4 == 0 {
+				data := LEDServerToUI{"18145536", "RED"}
+				ws.WriteJSON(data)
+			}
+
 		// case data := <-ChLEDToUI:
 		// 	ws.WriteJSON(data)
 

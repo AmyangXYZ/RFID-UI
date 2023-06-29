@@ -13,7 +13,7 @@ type Tag struct {
 	EPC              string        `json:"epc"`
 	Data             []RFIDData    `json:"data"`
 	AddPortFlag      bool          `json:"add_port_flag"`
-	// LED              string        `json:"led"`
+	LED              string        `json:"led"`
 }
 
 func newTag(epc string) *Tag {
@@ -22,7 +22,7 @@ func newTag(epc string) *Tag {
 		ChSigBreak:       make(chan bool),
 		EPC:              epc,
 		AddPortFlag:      true,
-		// LED:              "GREY",
+		LED:              "GREY",
 	}
 }
 
@@ -55,7 +55,7 @@ func (tag *Tag) handleData() {
 
 				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
 
-				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText}
+				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.LED}
 				fmt.Println("speed:", tag.EPC, speed)
 				//send frontend "Red LED"
 

@@ -14,7 +14,7 @@ const selectableTagIDs = ref([
   }
 ])
 const selectedTagID = ref('')
-const input = ref('')   //here
+const boxinput = ref('')
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
@@ -28,9 +28,9 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 <template>
   <el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
-    <el-row align="middle" justify="space-around"> 
+    <!-- <el-row align="middle" justify="space-around"> 
       <el-col :span="16">
-        <el-select v-model="selectedTagID" class="m-2" placeholder="Select">
+        <el-select v-model="selectedTagID" class="m-2" placeholder="Select EPC">
           <el-option
             v-for="item in selectableTagIDs"
             :key="item.id"
@@ -43,16 +43,14 @@ const handleClose = (key: string, keyPath: string[]) => {
       <el-col :span="6" style="vertical-align: center">
         <el-button size="small" :icon="Plus" @click="registerTag(selectedTagID)"> </el-button>
       </el-col> 
-    </el-row>
+    </el-row> -->
 
     <el-row align="middle" justify="space-around"> 
       <el-col :span="16">
-        <el-input>
-          <el-input v-model="input" placeholder="Please input" />
-        </el-input>
-      </el-col>
+          <el-input type="text" v-model="boxinput" placeholder="enter EPC here"  />
+        </el-col>
       <el-col :span="6" style="vertical-align: center">
-        <el-button size="small" :icon="Plus" @click="registerTag(input)"> </el-button>
+        <el-button size="small" :icon="Plus" @click="registerTag(boxinput)"> </el-button>
       </el-col>
     </el-row>
 

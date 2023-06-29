@@ -5,8 +5,14 @@ const { tags } = useTagHolder()
 </script>
 
 <template>
-  <div>Current Tags: {{ tags }}</div>
-  <div>Tags Status: </div>
+  <div> 
+    <ul>
+      <ol v-for="tag in tags">
+        {{ tag.epc }}--{{ tag.led }}
+      </ol>
+    </ul>
+  </div>
+  <!-- <div>Current Tags: {{ tags }}</div> -->
   
 </template>
 
