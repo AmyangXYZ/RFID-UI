@@ -104,9 +104,10 @@ func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 	fmt.Println(id)
 	id24 := strings.Repeat("0", 24-len(id)) + id
 	epc := "epc" + id
-	tag := newTag(epc)
+	tag := newTag(epc, id24)
 	ChLEDToUI <- LEDServerToUI{epc, "grey"}
 	TagHolder[id24] = tag
+	fmt.Println(id24)
 	go tag.handleData()
 
 	fmt.Println("TagHolder", TagHolder)
@@ -147,8 +148,11 @@ func GetWebSocket(ctx *sgo.Context) error {
 				ws.WriteJSON(data)
 
 			} else if count%3 == 0 {
-				data := LEDServerToUI{"18145536", "GREEN"}
+				// data := LEDServerToUI{"18145536", "GREEN"}
+				tag := TagHolder["000000000000000000000945"]
+				data := LEDServerToUI{tag.EPC, tag.LED}
 				ws.WriteJSON(data)
+
 			} else if count%4 == 0 {
 				data := LEDServerToUI{"18145536", "RED"}
 				ws.WriteJSON(data)

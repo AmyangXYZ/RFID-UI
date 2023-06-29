@@ -10,7 +10,7 @@ const columns = [
     key: 'epc',
     dataKey: 'epc',
     title: 'EPC',
-    width: 100,
+    width: 200,
     align: 'center'
   },
 

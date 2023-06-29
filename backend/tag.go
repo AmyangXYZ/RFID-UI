@@ -11,16 +11,18 @@ type Tag struct {
 	ChDataFromReader chan RFIDData `json:"-"`
 	ChSigBreak       chan bool     `json:"-"` // use - to omit it when convert to JSON
 	EPC              string        `json:"epc"`
+	EPC24            string        `json:"epc24"`
 	Data             []RFIDData    `json:"data"`
 	AddPortFlag      bool          `json:"add_port_flag"`
 	LED              string        `json:"led"`
 }
 
-func newTag(epc string) *Tag {
+func newTag(epc string, epc24 string) *Tag {
 	return &Tag{
 		ChDataFromReader: make(chan RFIDData, 1024),
 		ChSigBreak:       make(chan bool),
 		EPC:              epc,
+		EPC24:            epc24,
 		AddPortFlag:      true,
 		LED:              "GREY",
 	}
