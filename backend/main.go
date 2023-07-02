@@ -60,8 +60,14 @@ func main() {
 		return ctx.Text(200, "hello123")
 	})
 
-	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
+	tag1 := newTag("epc945", "000000000000000000000945")
+	tag2 := newTag("epc946", "000000000000000000000946")
+	TagHolder["000000000000000000000945"] = tag1
+	TagHolder["000000000000000000000946"] = tag2
 
+	fmt.Println("in maim", tag1, tag2)
+
+	app.POST("/api/reader/connect", PostFromReader)      // receive data from rfid reader
 	app.GET("/api/ui/tag", GetAllTags)                   // retrieve tag list (or tag holder)
 	app.POST("/api/ui/tag/:id", PostTag)                 // register a tag by name
 	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS??
@@ -115,6 +121,7 @@ func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 }
 
 func GetWebSocket(ctx *sgo.Context) error {
+	fmt.Println("in GetWebSocket ")
 	ws, err := upgrader.Upgrade(ctx.Resp, ctx.Req, nil)
 	breakSig := make(chan bool)
 	if err != nil {
@@ -139,6 +146,7 @@ func GetWebSocket(ctx *sgo.Context) error {
 		// 	ws.WriteJSON(data)
 
 		case <-time.After(1 * time.Second):
+			fmt.Println(count)
 			count++
 			if count%7 == 0 {
 
