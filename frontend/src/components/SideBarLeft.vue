@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { useTagHolder } from '../hooks/useTagHolder'
+import { useRecord } from '../hooks/useRecord'
 
-const { registerTag } = useTagHolder()
+const { registerTag } = useRecord()
 
 const selectableTagIDs = ref([
   {

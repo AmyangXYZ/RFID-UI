@@ -24,6 +24,7 @@ var (
 	Distance   float64 = 0.86 //unit m
 	ChDataToUI         = make(chan DataServerToUI, 1024)
 	ChLEDToUI          = make(chan LEDServerToUI, 1024)
+	ChBreak            = make(chan bool, 1024)
 )
 
 // sever to UI
@@ -67,9 +68,10 @@ func main() {
 
 	fmt.Println("in maim", tag1, tag2)
 
-	app.POST("/api/reader/connect", PostFromReader)      // receive data from rfid reader
-	app.GET("/api/ui/tag", GetAllTags)                   // retrieve tag list (or tag holder)
-	app.POST("/api/ui/tag/:id", PostTag)                 // register a tag by name
+	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
+	app.GET("/api/ui/tag", GetAllTags)              // retrieve tag list (or tag holder)
+	app.POST("/api/ui/tag/:id", PostTag)            // register a tag by name
+	app.POST("/api/ui/tagdelete/:id24", DeleteTag)
 	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS??
 	app.GET("/api/ui/ws", GetWebSocket)                  // server data to UI
 	app.Run(":16311")                                    //block
@@ -94,6 +96,7 @@ func PostFromReader(ctx *sgo.Context) error {
 	if _, ok := TagHolder[readerEpcInput24]; ok { //only pass data if key exist
 		// if TagHolder[readerEpcInput24].AddPortFlag  // each tag will check this flag itself
 		TagHolder[readerEpcInput24].ChDataFromReader <- data.TagReads[0]
+		// TagHolder[readerEpcInput24].ChSigBreak <- ChBreak
 	} else {
 		fmt.Println("please register Tag")
 	}
@@ -101,6 +104,15 @@ func PostFromReader(ctx *sgo.Context) error {
 }
 
 func GetAllTags(ctx *sgo.Context) error {
+	return ctx.JSON(200, 1, "success", TagHolder)
+}
+
+func DeleteTag(ctx *sgo.Context) error {
+	id24 := ctx.Param("id24")
+	fmt.Println("go: delet click  from DeletTag", id24)
+	TagHolder[id24].ChSigBreak <- true
+	delete(TagHolder, id24)
+	fmt.Println("TagHolder", TagHolder)
 	return ctx.JSON(200, 1, "success", TagHolder)
 }
 
@@ -155,15 +167,27 @@ func GetWebSocket(ctx *sgo.Context) error {
 				data := DataServerToUI{"18145536", 22.22, timeText, "RED"}
 				ws.WriteJSON(data)
 
-			} else if count%3 == 0 {
+			} else if count%17 == 0 {
 				// data := LEDServerToUI{"18145536", "GREEN"}
-				tag := TagHolder["000000000000000000000945"]
-				data := LEDServerToUI{tag.EPC, tag.LED}
-				ws.WriteJSON(data)
 
-			} else if count%4 == 0 {
-				data := LEDServerToUI{"18145536", "RED"}
-				ws.WriteJSON(data)
+				tag := TagHolder["000000000000000000000945"]
+				tag.LED = "GREEN"
+				// ChLEDToUI <- LEDServerToUI{"epc555", "GREEN"}
+				// data := LEDServerToUI{tag.EPC, tag.LED}
+				ws.WriteJSON(TagHolder)
+
+			} else if count%10 == 0 {
+				tag := TagHolder["000000000000000000000945"]
+
+				tag.LED = "RED"
+				// 	ChLEDToUI <- LEDServerToUI{"epc555", "RED"}
+				// 	data := LEDServerToUI{tag.EPC, tag.LED}
+
+				ws.WriteJSON(TagHolder)
+			} else if count%17 == 0 {
+				tag := TagHolder["000000000000000000000945"]
+				tag.LED = "GREY"
+				ws.WriteJSON(TagHolder)
 			}
 
 		// case data := <-ChLEDToUI:

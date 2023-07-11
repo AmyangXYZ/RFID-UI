@@ -42,11 +42,14 @@ func (tag *Tag) handleData() {
 		case data := <-tag.ChDataFromReader:
 			if tag.AddPortFlag {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
+				tag.LED = "GREEN"
 				tag.Data = append(tag.Data, data)
 				// fmt.Println(tag.EPC, tag.Data)
 			}
 			if len(tag.countPortNumType()) > 1 {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
+				tag.LED = "RED"
+
 				tag.AddPortFlag = false // no need a setter, since this attribute is public
 				timeRangeStart := tag.Data[0].FirstSeenTimestamp
 				timeRangeEnd := tag.Data[len(tag.Data)-1].FirstSeenTimestamp
@@ -73,6 +76,7 @@ func (tag *Tag) handleData() {
 			}
 		case <-tag.ChSigBreak:
 			fmt.Println("quit", tag.EPC)
+
 			return
 		}
 	}

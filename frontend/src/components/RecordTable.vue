@@ -2,8 +2,10 @@
 import { ref, watch, nextTick } from 'vue'
 import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
+// const { tags } = useTagHolder()
 
-const { records } = useRecord()
+
+const { records,tags,deleteTag } = useRecord()
 
 const columns = [
   {
@@ -40,6 +42,7 @@ watch(
       })
     }
   },
+
   { deep: true }
 )
 </script>
@@ -65,6 +68,21 @@ watch(
       </template>
     </el-auto-resizer>
   </el-card>
+
+
+  <div> 
+    <ul>
+      
+      <ol v-for="(tag,index) in tags" v-bind:class="tag.led ">
+
+        {{tag.epc}} 
+        <p v-if="tag.led ==='GREY'">ACTIVE</p>
+        <p v-if="tag.led ==='GREEN'">(ACTIVE) Passing First Antenna</p>
+        <p v-if="tag.led ==='RED'">(HOLD) Passing Second Antenna </p>
+        <button @click="deleteTag(tags[index].epc24)">Delet</button>
+      </ol>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
@@ -73,4 +91,26 @@ watch(
   justify-content: space-between;
   align-items: center;
 }
+ol{
+            list-style-type: none;
+            background:lightgray;
+            margin: 10px auto;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+        }
+
+ol.GREY{
+    background: lightgray;
+}
+ol.RED{
+  background: orange ;
+}
+ol.GREEN{
+  background: greenyellow ;
+}
+
 </style>
