@@ -50,7 +50,7 @@ func (tag *Tag) handleData() {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
 				tag.LED = "RED"
 
-				tag.AddPortFlag = false // no need a setter, since this attribute is public
+				tag.AddPortFlag = false
 				timeRangeStart := tag.Data[0].FirstSeenTimestamp
 				timeRangeEnd := tag.Data[len(tag.Data)-1].FirstSeenTimestamp
 				timeDiff := float64(timeRangeEnd-timeRangeStart) / 1000000
@@ -60,9 +60,8 @@ func (tag *Tag) handleData() {
 
 				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
 
-				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.LED}
+				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText}
 				fmt.Println("speed:", tag.EPC, speed)
-				//send frontend "Red LED"
 
 				tag.Data = []RFIDData{}
 
@@ -71,6 +70,9 @@ func (tag *Tag) handleData() {
 					time.Sleep(time.Duration(2*timeDiff) * time.Second)
 					tag.AddPortFlag = true
 					fmt.Println(tag.EPC, "timer end, ready to run")
+					ChLEDToUI <- LEDServerToUI{tag.EPC, "GREY"}
+					tag.LED = "GREY"
+
 				}()
 
 			}

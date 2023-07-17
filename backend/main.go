@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/AmyangXYZ/sgo"
 	"github.com/AmyangXYZ/sgo/middlewares"
@@ -38,7 +37,6 @@ type DataServerToUI struct { //go AaaBbb //json: zz_zz //
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
 	Time     string  `json:"time"`
-	Led      string  `json:led`
 }
 
 // reader to server
@@ -61,12 +59,12 @@ func main() {
 		return ctx.Text(200, "hello123")
 	})
 
-	tag1 := newTag("epc945", "000000000000000000000945")
-	tag2 := newTag("epc946", "000000000000000000000946")
-	TagHolder["000000000000000000000945"] = tag1
-	TagHolder["000000000000000000000946"] = tag2
+	// tag1 := newTag("epc945", "000000000000000000000945")
+	// tag2 := newTag("epc946", "000000000000000000000946")
+	// TagHolder["000000000000000000000945"] = tag1
+	// TagHolder["000000000000000000000946"] = tag2
 
-	fmt.Println("in maim", tag1, tag2)
+	// fmt.Println("in maim", tag1, tag2)
 
 	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
 	app.GET("/api/ui/tag", GetAllTags)              // retrieve tag list (or tag holder)
@@ -90,9 +88,10 @@ func PostFromReader(ctx *sgo.Context) error {
 	}
 	var data RFIDDataFromReader // raw read struct
 	json.Unmarshal(body, &data)
-	fmt.Println(data) //len could be 1 or 2 // use first one
+	// fmt.Println(data) //len could be 1 or 2 // use first one
 
 	readerEpcInput24 := data.TagReads[0].Epc
+	fmt.Println(readerEpcInput24)
 	if _, ok := TagHolder[readerEpcInput24]; ok { //only pass data if key exist
 		// if TagHolder[readerEpcInput24].AddPortFlag  // each tag will check this flag itself
 		TagHolder[readerEpcInput24].ChDataFromReader <- data.TagReads[0]
@@ -123,12 +122,11 @@ func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 	id24 := strings.Repeat("0", 24-len(id)) + id
 	epc := "epc" + id
 	tag := newTag(epc, id24)
-	ChLEDToUI <- LEDServerToUI{epc, "grey"}
 	TagHolder[id24] = tag
 	fmt.Println(id24)
 	go tag.handleData()
 
-	fmt.Println("TagHolder", TagHolder)
+	fmt.Println("TagHolder in go", TagHolder)
 	return ctx.JSON(200, 1, "success", TagHolder)
 }
 
@@ -151,47 +149,50 @@ func GetWebSocket(ctx *sgo.Context) error {
 			}
 		}
 	}()
-	count := 0
+	// count := 0
 	for {
 		select {
-		// case data := <-ChDataToUI:
-		// 	ws.WriteJSON(data)
+		case data := <-ChDataToUI:
+			ws.WriteJSON(data)
+			fmt.Println("go chan", data)
 
-		case <-time.After(1 * time.Second):
-			fmt.Println(count)
-			count++
-			if count%7 == 0 {
+		case ledData := <-ChLEDToUI:
+			ws.WriteJSON(ledData)
+			fmt.Println("go chan", ledData)
 
-				hour, min, sec := time.Now().Clock()
-				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
-				data := DataServerToUI{"18145536", 22.22, timeText, "RED"}
-				ws.WriteJSON(data)
+		//testing case
+		// case <-time.After(1 * time.Second):
+		// 	fmt.Println(count)
+		// 	count++
+		// 	if count%7 == 0 {
 
-			} else if count%17 == 0 {
-				// data := LEDServerToUI{"18145536", "GREEN"}
+		// 		hour, min, sec := time.Now().Clock()
+		// 		timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+		// 		data := DataServerToUI{"18145536", 22.22, timeText, "RED"}
+		// 		ws.WriteJSON(data)
 
-				tag := TagHolder["000000000000000000000945"]
-				tag.LED = "GREEN"
-				// ChLEDToUI <- LEDServerToUI{"epc555", "GREEN"}
-				// data := LEDServerToUI{tag.EPC, tag.LED}
-				ws.WriteJSON(TagHolder)
+		// 	} else if count%17 == 0 {
+		// 		// data := LEDServerToUI{"18145536", "GREEN"}
 
-			} else if count%10 == 0 {
-				tag := TagHolder["000000000000000000000945"]
+		// 		tag := TagHolder["000000000000000000000945"]
+		// 		tag.LED = "GREEN"
+		// 		// ChLEDToUI <- LEDServerToUI{"epc555", "GREEN"}
+		// 		// data := LEDServerToUI{tag.EPC, tag.LED}
+		// 		ws.WriteJSON(TagHolder)
 
-				tag.LED = "RED"
-				// 	ChLEDToUI <- LEDServerToUI{"epc555", "RED"}
-				// 	data := LEDServerToUI{tag.EPC, tag.LED}
+		// 	} else if count%10 == 0 {
+		// 		tag := TagHolder["000000000000000000000945"]
 
-				ws.WriteJSON(TagHolder)
-			} else if count%17 == 0 {
-				tag := TagHolder["000000000000000000000945"]
-				tag.LED = "GREY"
-				ws.WriteJSON(TagHolder)
-			}
+		// 		tag.LED = "RED"
+		// 		// 	ChLEDToUI <- LEDServerToUI{"epc555", "RED"}
+		// 		// 	data := LEDServerToUI{tag.EPC, tag.LED}
 
-		// case data := <-ChLEDToUI:
-		// 	ws.WriteJSON(data)
+		// 		ws.WriteJSON(TagHolder)
+		// 	} else if count%17 == 0 {
+		// 		tag := TagHolder["000000000000000000000945"]
+		// 		tag.LED = "GREY"
+		// 		ws.WriteJSON(TagHolder)
+		// 	}
 
 		case <-breakSig:
 			return nil
