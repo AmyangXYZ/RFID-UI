@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue'
 import { useWebSocket } from '@vueuse/core'
-import { useFetch } from '@vueuse/core'//
+import { useFetch } from '@vueuse/core'
+
 
 const tags = ref([])
 const records = ref<any>([])
@@ -10,8 +11,8 @@ export function useRecord(): any {
   // const { data } = useWebSocket('ws://localhost:16311/api/ui/ws', { autoReconnect: { delay: 2000 } })
   
   const getAllTags = async function () {
-    const { data } = await useFetch("http://localhost:16311/api/ui/tag").json()
-    console.log("getAllTags function",data)
+    const { data } = await useFetch("http://192.168.1.49:16311/api/ui/tag").json()
+    console.log("getAllTags function useRecord",data)
     tags.value = []
     for (const i in data.value.data) {
       tags.value.push(data.value.data[i])
@@ -19,19 +20,10 @@ export function useRecord(): any {
 
   }
 
-  const registerTag = function (id: string) {
-    useFetch("http://localhost:16311/api/ui/tag/"+id).post().text()//UI to server
-    getAllTags() //click button, all tags from server
-  }
-  
-  const deleteTag = function(id24:string){
-    console.log("in deleteTag", id24)
-    useFetch("http://localhost:16311/api/ui/tagdelete/"+id24).post().text()
-    getAllTags()
-  }
   
   
-  const { data } = useWebSocket('ws://localhost:16311/api/ui/ws')
+  
+  const { data } = useWebSocket('ws://192.168.1.49:16311/api/ui/ws')
 
   watch(data, () => {//trigger from channel
     if(data.value.indexOf("gait_speed")>-1){
@@ -57,5 +49,5 @@ export function useRecord(): any {
   
   )
 
-  return { records,tags,registerTag,getAllTags,deleteTag}
+  return { records,tags,getAllTags}
 }

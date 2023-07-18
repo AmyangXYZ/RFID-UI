@@ -109,8 +109,12 @@ func GetAllTags(ctx *sgo.Context) error {
 func DeleteTag(ctx *sgo.Context) error {
 	id24 := ctx.Param("id24")
 	fmt.Println("go: delet click  from DeletTag", id24)
-	TagHolder[id24].ChSigBreak <- true
-	delete(TagHolder, id24)
+	if _, ok := TagHolder[id24]; ok {
+		TagHolder[id24].ChSigBreak <- true
+		delete(TagHolder, id24)
+
+	}
+
 	fmt.Println("TagHolder", TagHolder)
 	return ctx.JSON(200, 1, "success", TagHolder)
 }

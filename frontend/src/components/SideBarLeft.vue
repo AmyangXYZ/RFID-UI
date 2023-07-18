@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { useRecord } from '../hooks/useRecord'
+import { useTagHolder } from '../hooks/useTagHolder'
 
-const { registerTag,tags,deleteTag } = useRecord()
+const { registerTag,tags,deleteTag } = useTagHolder()
 
 // const selectableTagIDs = ref([
 //   {
@@ -63,7 +63,7 @@ const handleClose = (key: string, keyPath: string[]) => {
         <p v-if="tag.led ==='GREY'">ACTIVE</p>
         <p v-if="tag.led ==='GREEN'">(ACTIVE) Passing First Antenna</p>
         <p v-if="tag.led ==='RED'">(HOLD) Passing Second Antenna </p>
-        <button @click="deleteTag(tags[index].epc24)">Delet</button>
+        <button @click="deleteTag(tags[index].epc24)"   class="Button">Delet</button>
       </ol>
   
   </div>
@@ -78,7 +78,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 <style scoped>
 .side-bar {
-  height: 48vh;
+  height: 77vh;
 }
 
 ol{
@@ -89,14 +89,17 @@ ol{
             padding: 15px 15px 15px 15px;
             border-radius: 10px;
             display:flex;
-            width:460px;
+            width:300px;
 
             align-items: center;
             justify-content: space-between;
             
 
         }
-
+Button{
+  width: 40px;
+  height: 30px;
+}
 ol.GREY{
     background: lightgray;
 

@@ -3,8 +3,18 @@ import { ref, watch, nextTick } from 'vue'
 import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
 
-const { records,tags,deleteTag } = useRecord()
+const { records} = useRecord()
+//for register input box
+const boxinput = ref('')
 
+const handleOpen = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+  console.log(key, keyPath)
+}
+
+//for record 
 const columns = [
   {
     key: 'epc',
@@ -46,6 +56,7 @@ watch(
 </script>
 
 <template>
+
   <el-card style="width: 100%">
     <template #header>
       <div class="card-header">
