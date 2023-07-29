@@ -105,15 +105,16 @@ ol{
             border-radius: 10px;
             display:flex;
             width:450px;
-
+            font-size: medium;
             align-items: center;
             justify-content: space-between;
             
 
         }
 Button{
-  width: 55px;
+  width: 80px;
   height: 30px;
+  font-size: medium;
 }
 ol.GREY{
     background: lightgray;
@@ -124,6 +125,9 @@ ol.RED{
 }
 ol.GREEN{
   background: greenyellow ;
+}
+.el-input{
+  font-size: large;
 }
 
 </style>

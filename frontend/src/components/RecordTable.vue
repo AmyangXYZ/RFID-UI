@@ -33,7 +33,7 @@ const columns = [
     key: 'gaitSpeed',
     dataKey: 'gait_speed',
     title: 'Gait Speed (m/s)',
-    width: 150,
+    width: 180,
     align: 'left'
   },
   {
@@ -97,7 +97,7 @@ watch(
   align-items: center;
 }
 .el-table-v2{
-  font-size: large;
+  font-size: medium;
 }
 
 </style>
