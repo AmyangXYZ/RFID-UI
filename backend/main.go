@@ -116,7 +116,7 @@ func DeleteTag(ctx *sgo.Context) error {
 	}
 
 	fmt.Println("TagHolder", TagHolder)
-	return ctx.JSON(200, 1, "success", TagHolder)
+	return ctx.JSON(200, 1, "success", nil)
 }
 
 func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
@@ -131,7 +131,7 @@ func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 	go tag.handleData()
 
 	fmt.Println("TagHolder in go", TagHolder)
-	return ctx.JSON(200, 1, "success", TagHolder)
+	return ctx.JSON(200, 1, "success", nil)
 }
 
 func GetWebSocket(ctx *sgo.Context) error {
@@ -158,12 +158,15 @@ func GetWebSocket(ctx *sgo.Context) error {
 		select {
 		case data := <-ChDataToUI:
 			ws.WriteJSON(data)
-			fmt.Println("go chan", data)
+			fmt.Println("go chan data", data)
 
 		case ledData := <-ChLEDToUI:
 			ws.WriteJSON(ledData)
-			fmt.Println("go chan", ledData)
+			fmt.Println("go chan ledData", ledData)
 
+		// case <-time.After(1 * time.Second):
+		// 	fmt.Println(count)
+		// 	count++
 		//testing case
 		// case <-time.After(1 * time.Second):
 		// 	fmt.Println(count)

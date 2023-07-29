@@ -2,8 +2,13 @@
 import { ref, watch, nextTick } from 'vue'
 import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
+import {records  } from '../hooks/useStates'
 
-const { records} = useRecord()
+// const { records} = useRecord()
+
+// import { records } from '../hooks/useStates'
+const {getData} = useRecord()
+getData()
 //for register input box
 const boxinput = ref('')
 
@@ -20,7 +25,7 @@ const columns = [
     key: 'epc',
     dataKey: 'epc',
     title: 'EPC',
-    width: 200,
+    width: 250,
     align: 'center'
   },
 
@@ -29,14 +34,14 @@ const columns = [
     dataKey: 'gait_speed',
     title: 'Gait Speed (m/s)',
     width: 150,
-    align: 'center'
+    align: 'left'
   },
   {
     key: 'time',
     dataKey: 'time',
     title: 'Time',
-    width: 100,
-    align: 'center'
+    width: 150,
+    align: 'left'
   }
 ]
 
@@ -55,23 +60,27 @@ watch(
 )
 </script>
 
-<template>
 
+
+
+
+
+<template>
   <el-card style="width: 100%">
     <template #header>
       <div class="card-header">
         <span>Records</span>
-        <el-button @click="records = []" :icon="Refresh" size="small">Clear</el-button>
+        <el-button @click="records = []" :icon="Refresh">Clear</el-button>
       </div>
     </template>
     <el-auto-resizer>
-      <template #default="{ width }">
+      <template #default="{width }">
         <el-table-v2
           ref="tableRef"
           :columns="columns"
           :data="records"
           :width="width"
-          :height="500"
+          :height="600"
           fixed
         />
       </template>
@@ -79,7 +88,6 @@ watch(
   </el-card>
 
 
-  
 </template>
 
 <style scoped>
@@ -88,26 +96,8 @@ watch(
   justify-content: space-between;
   align-items: center;
 }
-ol{
-            list-style-type: none;
-            background:lightgray;
-            margin: 10px auto;
-            padding: 10px 20px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-        }
-
-ol.GREY{
-    background: lightgray;
-}
-ol.RED{
-  background: orange ;
-}
-ol.GREEN{
-  background: greenyellow ;
+.el-table-v2{
+  font-size: large;
 }
 
 </style>

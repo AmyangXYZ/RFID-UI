@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref ,watch,nextTick} from 'vue'
 import { Plus } from '@element-plus/icons-vue'
+import { useRecord  } from '../hooks/useRecord'
 import { useTagHolder } from '../hooks/useTagHolder'
+import { tags} from '../hooks/useStates'
+// const { registerTag,tags,deleteTag } = useRecord()
+const { registerTag,deleteTag } = useTagHolder()
 
-const { registerTag,tags,deleteTag } = useTagHolder()
 
 // const selectableTagIDs = ref([
 //   {
@@ -22,12 +25,14 @@ const handleOpen = (key: string, keyPath: string[]) => {
 const handleClose = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+
+
 </script>
 
 
 
 <template>
-  <el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
+<el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
     <!-- <el-row align="middle" justify="space-around"> 
       <el-col :span="16">
         <el-select v-model="selectedTagID" class="m-2" placeholder="Select EPC">
@@ -45,8 +50,8 @@ const handleClose = (key: string, keyPath: string[]) => {
       </el-col> 
     </el-row> -->
 
-    <el-row align="middle" justify="space-around"> 
-      <el-col :span="15">
+    <el-row  align="middle" justify="space-around"> 
+      <el-col :span="16">
           <el-input type="text" v-model="boxinput" placeholder="enter EPC here"  />
         </el-col>
       <el-col :span="7" style="vertical-align: center">
@@ -61,15 +66,25 @@ const handleClose = (key: string, keyPath: string[]) => {
       <ol v-for="(tag,index) in tags" v-bind:class="tag.led ">
         {{tag.epc}}    
         <p v-if="tag.led ==='GREY'">ACTIVE</p>
-        <p v-if="tag.led ==='GREEN'">(ACTIVE) Passing First Antenna</p>
-        <p v-if="tag.led ==='RED'">(HOLD) Passing Second Antenna </p>
-        <button @click="deleteTag(tags[index].epc24)"   class="Button">Delet</button>
+        <p v-if="tag.led ==='GREEN'">(ACTIVE) First Antenna</p>
+        <p v-if="tag.led ==='RED'">(HOLD) Second Antenna </p>
+        <button @click="deleteTag(tags[index].epc24)"   class="Button">Delete</button>
       </ol>
   
   </div>
     </el-row>
 
-  </el-menu>
+</el-menu>
+
+
+
+
+
+
+
+
+
+
   
  
 
@@ -89,7 +104,7 @@ ol{
             padding: 15px 15px 15px 15px;
             border-radius: 10px;
             display:flex;
-            width:300px;
+            width:450px;
 
             align-items: center;
             justify-content: space-between;
@@ -97,7 +112,7 @@ ol{
 
         }
 Button{
-  width: 40px;
+  width: 55px;
   height: 30px;
 }
 ol.GREY{
