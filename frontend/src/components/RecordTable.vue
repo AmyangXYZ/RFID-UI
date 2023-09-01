@@ -2,7 +2,7 @@
 import { ref, watch, nextTick } from 'vue'
 import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
-import {records  } from '../hooks/useStates'
+import { records  } from '../hooks/useStates'
 
 // const { records} = useRecord()
 

@@ -53,10 +53,11 @@ type RFIDDataFromReader struct {
 func main() {
 
 	app := sgo.New()
+	app.SetTemplates("templates", nil)
 	app.USE(middlewares.CORS(middlewares.CORSOpt{}))
 
 	app.GET("/", func(ctx *sgo.Context) error {
-		return ctx.Text(200, "hello123")
+		return ctx.Render(200, "i")
 	})
 
 	// tag1 := newTag("epc945", "000000000000000000000945")
@@ -66,6 +67,7 @@ func main() {
 
 	// fmt.Println("in maim", tag1, tag2)
 
+	app.GET("/assets/*files", assets)
 	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
 	app.GET("/api/ui/tag", GetAllTags)              // retrieve tag list (or tag holder)
 	app.POST("/api/ui/tag/:id", PostTag)            // register a tag by name
@@ -73,6 +75,14 @@ func main() {
 	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS??
 	app.GET("/api/ui/ws", GetWebSocket)                  // server data to UI
 	app.Run(":16311")                                    //block
+}
+
+// Static files handler.
+func assets(ctx *sgo.Context) error {
+	staticHandle := http.StripPrefix("/assets",
+		http.FileServer(http.Dir("./assets")))
+	staticHandle.ServeHTTP(ctx.Resp, ctx.Req)
+	return nil
 }
 
 func PutDistance(ctx *sgo.Context) error {

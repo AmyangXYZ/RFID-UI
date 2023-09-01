@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref ,watch,nextTick} from 'vue'
+import { ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { useRecord  } from '../hooks/useRecord'
 import { useTagHolder } from '../hooks/useTagHolder'
 import { tags} from '../hooks/useStates'
 // const { registerTag,tags,deleteTag } = useRecord()
@@ -28,9 +27,6 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 
 </script>
-
-
-
 <template>
 <el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
     <!-- <el-row align="middle" justify="space-around"> 

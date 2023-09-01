@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"strconv"
 	"time"
 )
 
@@ -56,9 +55,11 @@ func (tag *Tag) handleData() {
 				timeDiff := float64(timeRangeEnd-timeRangeStart) / 1000000
 				speed := float64(Distance / timeDiff)
 				speed = math.Round(speed*1000) / 1000
-				hour, min, sec := time.Now().Clock()
+				// hour, min, sec := time.Now().Clock()
 
-				timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+				// timeText := strconv.Itoa(hour) + ":" + strconv.Itoa(min) + ":" + strconv.Itoa(sec)
+				currentTime := time.Now()
+				timeText := currentTime.Format("15:04:05 PM")
 
 				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText}
 				fmt.Println("speed:", tag.EPC, speed)

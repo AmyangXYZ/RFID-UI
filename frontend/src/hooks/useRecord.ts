@@ -1,8 +1,6 @@
-import { ref, watch } from 'vue'
+import { watch } from 'vue'
 import { useWebSocket } from '@vueuse/core'
 import { useFetch } from '@vueuse/core'
-
-
 import {tags,records  } from './useStates'
 // const tags = ref([])
 
@@ -11,7 +9,7 @@ export function useRecord(): any {
   // const { data } = useWebSocket('ws://localhost:16311/api/ui/ws', { autoReconnect: { delay: 2000 } })
   
   const getAllTags = async function () {
-    const { data } = await useFetch("http://192.168.10.179:16311/api/ui/tag").json()
+    const { data } = await useFetch("/api/ui/tag").json()
     // console.log("getAllTags function useRecord",data)
     tags.value = []
     for (const i in data.value.data) {
@@ -33,7 +31,7 @@ export function useRecord(): any {
   // }
 
   const getData = function(){
-    const { data } = useWebSocket('ws://192.168.10.179:16311/api/ui/ws')
+    const { data } = useWebSocket("ws://"+window.location.host+"/api/ui/ws")
 
   watch(data, () => {//trigger from channel
     if(data.value.indexOf("gait_speed")>-1){
