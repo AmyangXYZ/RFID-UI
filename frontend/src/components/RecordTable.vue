@@ -2,24 +2,12 @@
 import { ref, watch, nextTick } from 'vue'
 import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
-import { records  } from '../hooks/useStates'
+import { records } from '../hooks/useStates'
 
-// const { records} = useRecord()
+const { getData } = useRecord()
 
-// import { records } from '../hooks/useStates'
-const {getData} = useRecord()
 getData()
-//for register input box
-const boxinput = ref('')
 
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-}
-
-//for record 
 const columns = [
   {
     key: 'epc',
@@ -60,11 +48,6 @@ watch(
 )
 </script>
 
-
-
-
-
-
 <template>
   <el-card style="width: 100%">
     <template #header>
@@ -74,7 +57,7 @@ watch(
       </div>
     </template>
     <el-auto-resizer>
-      <template #default="{width }">
+      <template #default="{ width }">
         <el-table-v2
           ref="tableRef"
           :columns="columns"
@@ -86,8 +69,6 @@ watch(
       </template>
     </el-auto-resizer>
   </el-card>
-
-
 </template>
 
 <style scoped>
@@ -96,7 +77,7 @@ watch(
   justify-content: space-between;
   align-items: center;
 }
-.el-table-v2{
+.el-table-v2 {
   font-size: medium;
 }
 
