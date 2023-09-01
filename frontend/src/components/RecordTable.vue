@@ -80,5 +80,4 @@ watch(
 .el-table-v2 {
   font-size: medium;
 }
-
 </style>

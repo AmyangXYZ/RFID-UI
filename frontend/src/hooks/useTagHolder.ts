@@ -11,13 +11,13 @@ export function useTagHolder() {
       tags.value.push(data.value.data[i])
     }
   }
-  
+
   const registerTag = function (id: string) {
     console.log('in registerTag', id)
 
     useFetch('/api/ui/tag/' + id)
       .post()
-      .text() 
+      .text()
     setTimeout(getAllTags, 250)
   }
 

@@ -35,6 +35,5 @@ const handleSelect = (key: string, keyPath: string[]) => {
 p {
   padding: 10px;
   font-size: 18px;
-  
 }
 </style>

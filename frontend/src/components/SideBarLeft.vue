@@ -28,7 +28,7 @@ const handleClose = (key: string, keyPath: string[]) => {
       <div>
         <p>All registed tag status show below:</p>
 
-        <ol v-for="(tag, index) in tags"  v-bind:class="tag.led">
+        <ol v-for="(tag, index) in tags" v-bind:class="tag.led">
           {{
             tag.epc
           }}
@@ -66,7 +66,6 @@ Button {
 }
 ol.GREY {
   background: lightgray;
-
 }
 ol.RED {
   background: orange;
@@ -77,5 +76,4 @@ ol.GREEN {
 .el-input {
   font-size: large;
 }
-
 </style>
