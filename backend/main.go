@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/AmyangXYZ/sgo"
@@ -19,7 +20,7 @@ var (
 		WriteBufferSize: 1024,
 	}
 	TagHolder          = make(map[string]*Tag)
-	Distance   float64 = 0.86 //unit m
+	Distance   float64 = 4 //unit m
 	ChDataToUI         = make(chan DataServerToUI, 1024)
 	ChLEDToUI          = make(chan LEDServerToUI, 1024)
 	ChBreak            = make(chan bool, 1024)
@@ -35,6 +36,7 @@ type DataServerToUI struct {
 	Epc      string  `json:"epc"`
 	CalSpeed float64 `json:"gait_speed"`
 	Time     string  `json:"time"`
+	Dist     float64 `json:"dist"`
 }
 
 // reader to server
@@ -58,8 +60,10 @@ func main() {
 	app.GET("/assets/*files", assets)
 	app.POST("/api/reader/connect", PostFromReader) // receive data from rfid reader
 	app.GET("/api/ui/tag", GetAllTags)              // retrieve tag list (or tag holder)
-	app.POST("/api/ui/tag/:id", PostTag)            // register a tag by name
+
+	app.POST("/api/ui/tag/:id", PostTag) // register a tag by name
 	app.POST("/api/ui/tagdelete/:id24", DeleteTag)
+	app.POST("/api/ui/distance/:UIdist", SetDistance)
 	app.OPTIONS("/api/ui/tag/:id", sgo.PreflightHandler) // handle CORS
 	app.GET("/api/ui/ws", GetWebSocket)                  // server data to UI
 	app.Run(":16311")                                    //block
@@ -106,6 +110,15 @@ func DeleteTag(ctx *sgo.Context) error {
 	return ctx.JSON(200, 1, "success", nil)
 }
 
+func SetDistance(ctx *sgo.Context) error {
+	Distance, _ = strconv.ParseFloat(ctx.Param("UIdist"), 64)
+
+	fmt.Println("set current distance", Distance)
+	// return ctx.JSON(200, 1, "success", TagHolder)
+
+	return ctx.Text(200, fmt.Sprintf("Distance set to %v meters", Distance))
+}
+
 func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 	id := ctx.Param("id")
 	id24 := strings.Repeat("0", 24-len(id)) + id
@@ -117,7 +130,8 @@ func PostTag(ctx *sgo.Context) error { //from UI to server register new tag
 }
 
 func GetWebSocket(ctx *sgo.Context) error {
-	fmt.Println("Refresh GetWebSocket ")
+	fmt.Println("Refresh...current distance = ", Distance)
+	fmt.Println("RFID ready to run, please register tag ")
 	ws, err := upgrader.Upgrade(ctx.Resp, ctx.Req, nil)
 	breakSig := make(chan bool)
 	if err != nil {

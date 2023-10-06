@@ -30,7 +30,16 @@ const columns = [
     title: 'Time',
     width: 150,
     align: 'left'
-  }
+  },
+
+  {
+    key: 'dist',
+    dataKey: 'dist',
+    title: 'Distance(m)',
+    width: 150,
+    align: 'center'
+  },
+
 ]
 
 const tableRef = ref()

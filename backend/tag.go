@@ -14,6 +14,7 @@ type Tag struct {
 	Data             []RFIDData    `json:"data"`
 	AddPortFlag      bool          `json:"add_port_flag"`
 	LED              string        `json:"led"`
+	Dist             float64       `json:"dist"`
 }
 
 func newTag(epc string, epc24 string) *Tag {
@@ -24,6 +25,7 @@ func newTag(epc string, epc24 string) *Tag {
 		EPC24:            epc24,
 		AddPortFlag:      true,
 		LED:              "GREY",
+		Dist:             Distance,
 	}
 }
 
@@ -49,15 +51,16 @@ func (tag *Tag) handleData() {
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
 				tag.LED = "RED"
 				tag.AddPortFlag = false
+				tag.Dist = Distance
 				timeRangeStart := tag.Data[0].FirstSeenTimestamp
 				timeRangeEnd := tag.Data[len(tag.Data)-1].FirstSeenTimestamp
 				timeDiff := float64(timeRangeEnd-timeRangeStart) / 1000000
 				speed := float64(Distance / timeDiff)
 				speed = math.Round(speed*1000) / 1000
 				currentTime := time.Now()
-				timeText := currentTime.Format("15:04:05 AM")
-				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText}
-				fmt.Println("speed:", tag.EPC, speed)
+				timeText := currentTime.Format("15:04:05 PM")
+				ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.Dist}
+				fmt.Println("speed:", tag.EPC, speed, Distance, timeDiff)
 				tag.Data = []RFIDData{}
 				fmt.Println(tag.EPC, "timer start")
 				go func() {

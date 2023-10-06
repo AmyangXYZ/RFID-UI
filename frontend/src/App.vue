@@ -12,7 +12,7 @@ import SideBarLeft from './components/SideBarLeft.vue'
         <el-col :span="9">
           <SideBarLeft />
         </el-col>
-        <el-col :offset="1" :span="13">
+        <el-col :offset="1" :span="14">
           <RecordTable />
         </el-col>
       </el-row>

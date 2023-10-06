@@ -44,7 +44,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 <style scoped>
 .side-bar {
-  height: 77vh;
+  height: 98vh;
 }
 
 ol {
@@ -54,15 +54,18 @@ ol {
   padding: 15px 15px 15px 15px;
   border-radius: 10px;
   display: flex;
-  width: 450px;
+  width: 410px;
+  /* width: 180%; */
   font-size: medium;
   align-items: center;
   justify-content: space-between;
 }
+
 Button {
   width: 80px;
   height: 30px;
   font-size: medium;
+  
 }
 ol.GREY {
   background: lightgray;
