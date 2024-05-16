@@ -1,0 +1,2 @@
+antenna setting:
+https://platform.impinj.com/site/docs/reader_api_welcome/inv_example.gsp
