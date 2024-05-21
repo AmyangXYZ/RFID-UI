@@ -1,2 +1,3 @@
 antenna setting:
 https://platform.impinj.com/site/docs/reader_api_welcome/inv_example.gsp
+https://support.impinj.com/hc/en-us/articles/360000046899-Reader-Modes-RF-Modes-Made-Easy
