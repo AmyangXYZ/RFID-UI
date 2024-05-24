@@ -4,9 +4,11 @@ import { useRecord } from '../hooks/useRecord'
 import { Refresh } from '@element-plus/icons-vue'
 import { records } from '../hooks/useStates'
 
-const { getData } = useRecord()
+const { getData,getAllTags } = useRecord()
 
 getData()
+getAllTags()
+// setInterval(getAllTags,1000)
 
 const columns = [
   {
@@ -32,13 +34,6 @@ const columns = [
     align: 'left'
   },
 
-  {
-    key: 'dist',
-    dataKey: 'dist',
-    title: 'Distance(m)',
-    width: 150,
-    align: 'center'
-  },
 
 ]
 
@@ -87,6 +82,6 @@ watch(
   align-items: center;
 }
 .el-table-v2 {
-  font-size: medium;
+  font-size: large;
 }
 </style>

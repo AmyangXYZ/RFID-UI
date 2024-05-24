@@ -15,15 +15,15 @@ const handleClose = (key: string, keyPath: string[]) => {
 </script>
 <template>
   <el-menu default-active="0" class="side-bar" @open="handleOpen" @close="handleClose">
-    <el-row align="middle" justify="space-around">
+    <!-- <el-row align="middle" justify="space-around">
       <el-col :span="16">
         <el-input type="text" v-model="boxinput" placeholder="enter EPC here" />
       </el-col>
       <el-col :span="7" style="vertical-align: center">
         <el-button size="small" :icon="Plus" @click="registerTag(boxinput)"> </el-button>
       </el-col>
-    </el-row>
-    <br /><br />
+    </el-row> -->
+    <br />
     <el-row>
       <div>
         <p>All registed tag status show below:</p>
@@ -32,10 +32,10 @@ const handleClose = (key: string, keyPath: string[]) => {
           {{
             tag.epc
           }}
-          <p v-if="tag.led === 'GREY'">ACTIVE</p>
-          <p v-if="tag.led === 'GREEN'">(ACTIVE) First Antenna</p>
-          <p v-if="tag.led === 'RED'">(HOLD) Second Antenna</p>
-          <button @click="deleteTag(tags[index].epc24)" class="Button">Delete</button>
+          <p v-if="tag.led === 'GREY'">SLEEPING</p>
+          <p v-if="tag.led === 'GREEN'">ACTIVE</p>
+          <p v-if="tag.led === 'RED'">HOLD</p> 
+          <!-- <button @click="deleteTag(tags[index].epc24)" class="Button">Delete</button> -->
         </ol>
       </div>
     </el-row>
@@ -54,8 +54,9 @@ ol {
   padding: 15px 15px 15px 15px;
   border-radius: 10px;
   display: flex;
-  width: 410px;
+  /* width: 410px; */
   /* width: 180%; */
+  width:120%;
   font-size: medium;
   align-items: center;
   justify-content: space-between;

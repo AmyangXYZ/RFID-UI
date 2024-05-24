@@ -6,7 +6,7 @@ import { tags, records } from './useStates'
 export function useRecord(): any {
   const getAllTags = async function () {
     const { data } = await useFetch('/api/ui/tag').json()
-    // const { data } = await useFetch("http://192.168.0.100:16311/api/ui/tag").json()
+    // const { data } = await useFetch("http://192.168.0.111:16311/api/ui/tag").json()
 
     tags.value = []
     for (const i in data.value.data) {
@@ -15,8 +15,8 @@ export function useRecord(): any {
   }
   const getData = function () {
     const { data } = useWebSocket('ws://' + window.location.host + '/api/ui/ws')
-    // const { data } = useWebSocket('ws://192.168.0.100:16311/api/ui/ws')
-
+    // const { data } = useWebSocket('ws://localhost:16311/api/ui/ws')
+    // const { data } = useWebSocket('ws://192.168.0.111:16311/api/ui/ws')//ipad
 
     watch(data, () => {
       if (data.value.indexOf('gait_speed') > -1) {

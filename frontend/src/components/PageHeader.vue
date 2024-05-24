@@ -4,7 +4,7 @@ import Logo from '@/assets/uconn-health-logo.png'
 import { useTagHolder } from '../hooks/useTagHolder'
 
 
-const { enterDistance, distdata } = useTagHolder()
+// const { enterDistance, distdata } = useTagHolder()
 const boxinput = ref('')
 const activeIndex = ref('1')
 const handleSelect = (key: string, keyPath: string[]) => {
@@ -30,12 +30,13 @@ const handleSelect = (key: string, keyPath: string[]) => {
         </div>
         
       </ol> -->
-      <p>Current Distance: {{distdata.data}} meters </p>
-      <p>Distance:   
+      <!-- <p>Current Distance: {{distdata.data}} meters </p> -->
+      <p>Current Distance: 4.0 meters </p>
+      <!-- <p>Distance:   
         <input type="text" v-model="boxinput"   />
         meters
         <button @click="enterDistance(boxinput)" >Update</button>
-      </p>
+      </p> -->
       <p>Reader Name: SpeedwayR-14-D3-31</p>
       <p>Rx Sensitivity: -50</p>
       <p>Tx Power: 15</p>

@@ -4,6 +4,7 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
+    // "baseUrl": "http://localhost:16311/",
     "baseUrl": "/",
     "paths": {
       "@/*": ["./src/*"]
