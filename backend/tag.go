@@ -125,34 +125,6 @@ func (tag *Tag) handleData() {
 
 			}
 
-			// if tag.AddPortFlag {
-			// 	ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
-			// 	tag.LED = "GREEN"
-			// 	tag.Data = append(tag.Data, data)
-			// 	fmt.Println("port adding", tag.Data)
-			// }
-			// if len(tag.countPortNumType()) > 1 {
-			// 	ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
-			// 	tag.LED = "RED"
-			// 	tag.AddPortFlag = false
-
-			// 	maxIndex, meanPower := tag.maxIndexPower()
-			// 	fmt.Println("new function", maxIndex, meanPower)
-
-			// 	tag.Dist = Distance
-			// 	timeRangeStart := tag.Data[maxIndex].FirstSeenTimestamp
-			// 	timeRangeEnd := tag.Data[len(tag.Data)-1].FirstSeenTimestamp
-			// 	timeDiff := float64(timeRangeEnd-timeRangeStart) / 1000000
-			// 	speed := float64(Distance / timeDiff)
-			// 	speed = math.Round(speed*1000) / 1000
-			// 	currentTime := time.Now()
-			// 	timeText := currentTime.Format("15:04:05 PM")
-			// 	ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.Dist}
-			// 	fmt.Println("speed:", tag.EPC, speed, Distance, timeDiff)
-
-			// 	tag.Data = []RFIDData{}
-			// 	fmt.Println(tag.EPC, "timer start")
-
 			// 	// go func() {
 			// 	// 	time.Sleep(time.Duration(2*timeDiff) * time.Second)
 			// 	// 	tag.AddPortFlag = true
