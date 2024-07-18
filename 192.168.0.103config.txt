@@ -4,7 +4,7 @@
 activeProfile=0
 antennaPorts=1,9,17,25
 antennaStates=0,1,1,0
-transmitPower=21,26,21,21
+transmitPower=21,36,21,21
 receiveSensitivity=22,1,7,22
 startTriggerGpiEvent=0
 stopTriggerGpiEvent=1
