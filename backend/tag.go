@@ -43,7 +43,7 @@ func (tag *Tag) countPortNumType() map[int]int { //return {1:11, 9:1} ==> len=2
 
 func (tag *Tag) maxIndexPower() (int, int) {
 	// powerList := make([]int, 0)
-	maxValue, minValue, maxIndex := 0, 0, 0
+	maxValue, minValue, maxIndex := -99, 0, 0
 
 	firstValue := true
 

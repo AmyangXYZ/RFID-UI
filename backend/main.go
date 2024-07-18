@@ -104,12 +104,12 @@ func PostFromReader(ctx *sgo.Context) error {
 	json.Unmarshal(body, &data)
 	// readerEpcInput24 := data.TagReads[0].Epc
 	fmt.Println("---", len(data.TagReads)) //for debug
-	for _, readerdatasingle := range data.TagReads {
+	for i, readerdatasingle := range data.TagReads {
 		readerEpcInput24 := readerdatasingle.Epc
 		fmt.Println("---", readerdatasingle)          //for debug
 		if _, ok := TagHolder[readerEpcInput24]; ok { //only pass data if key exist
 			// if TagHolder[readerEpcInput24].AddPortFlag  // each tag will check this flag itself
-			TagHolder[readerEpcInput24].ChDataFromReader <- data.TagReads[0]
+			TagHolder[readerEpcInput24].ChDataFromReader <- data.TagReads[i]
 		} else {
 			fmt.Println("unregistered tag is dectected")
 		}
