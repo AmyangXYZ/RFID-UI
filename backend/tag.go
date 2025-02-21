@@ -6,19 +6,28 @@ import (
 	"time"
 )
 
+const WindowSize = 5
+const PeakDropThreshold = 1
+
+type RSSIEntry struct {
+	PeakRssi           int
+	FirstSeenTimestamp int64
+	Port               int
+}
+
 type Tag struct {
 	ChDataFromReader chan RFIDData `json:"-"`
 	ChSigBreak       chan bool     `json:"-"` // use - to omit it when convert to JSON
 	EPC              string        `json:"epc"`
 	EPC24            string        `json:"epc24"`
 	Data             []RFIDData    `json:"data"`
-
-	AddPortFlag bool    `json:"add_port_flag"`
-	LED         string  `json:"led"`
-	Dist        float64 `json:"dist"`
-	Starttime   int64   `json:"starttime"`
-	Endtime     int64   `json:"endtime"`
-	MeanPower   int     `json:"meanpower"`
+	RSSIWindow       []RSSIEntry
+	AddPortFlag      bool    `json:"add_port_flag"`
+	LED              string  `json:"led"`
+	Dist             float64 `json:"dist"`
+	Starttime        int64   `json:"starttime"`
+	Endtime          int64   `json:"endtime"`
+	MeanPower        int     `json:"meanpower"`
 }
 
 func newTag(epc string, epc24 string) *Tag {
@@ -40,32 +49,85 @@ func (tag *Tag) countPortNumType() map[int]int { //return {1:11, 9:1} ==> len=2
 	}
 	return m
 }
+func (tag *Tag) reverseData() {
+	for i, j := 0, len(tag.Data)-1; i < j; i, j = i+1, j-1 {
+		tag.Data[i], tag.Data[j] = tag.Data[j], tag.Data[i]
+	}
+}
 
-func (tag *Tag) maxIndexPower() (int, int) {
-	// powerList := make([]int, 0)
-	maxValue, minValue, maxIndex := -99, 0, 0
+func (tag *Tag) maxIndexPower() {
+	//use in first antenna. Have global array, moving window search in reverse order
+	tag.reverseData()
 
-	firstValue := true
-
-	for i, data := range tag.Data {
-
-		if firstValue {
-			minValue = data.PeakRssi
-			maxValue = data.PeakRssi
-			firstValue = false
-		} else {
-			if data.PeakRssi < minValue {
-				minValue = data.PeakRssi
-			}
-			if data.PeakRssi > maxValue {
-				maxValue = data.PeakRssi
-				maxIndex = i
-			}
+	for _, item := range tag.Data {
+		tag.updateWindow(item)
+		if tag.detectFirstPeak() {
+			tag.Starttime = item.FirstSeenTimestamp
+			break
 		}
 	}
-	meanPower := int(maxValue+minValue) / 2
-	print("in function", maxValue, minValue, meanPower)
-	return maxIndex, meanPower
+}
+
+func (tag *Tag) updateWindow(newData RFIDData) {
+	if len(tag.RSSIWindow) >= WindowSize {
+		tag.RSSIWindow = tag.RSSIWindow[1:] // Remove the oldest data
+	}
+	tag.RSSIWindow = append(tag.RSSIWindow, RSSIEntry{
+		PeakRssi:           newData.PeakRssi,
+		FirstSeenTimestamp: newData.FirstSeenTimestamp,
+		Port:               newData.AntennaPort,
+	})
+}
+
+func (tag *Tag) detectFirstPeak() bool { // first peak for 1st antenna
+	if len(tag.RSSIWindow) < WindowSize {
+		return false // Not enough data
+	}
+
+	maxVal := tag.RSSIWindow[0].PeakRssi
+	maxIndex := 0
+
+	// Find max RSSI within the window
+	for i, entry := range tag.RSSIWindow {
+		if entry.PeakRssi > maxVal {
+			maxVal = entry.PeakRssi
+			maxIndex = i
+		}
+	}
+
+	// Ensure a significant drop after the peak
+	if maxIndex < len(tag.RSSIWindow)-1 {
+		if maxVal-tag.RSSIWindow[maxIndex+1].PeakRssi >= PeakDropThreshold {
+			return true
+		}
+	}
+
+	return false
+}
+func (tag *Tag) detectLastPeak() bool { // last peak search in forward order for 2nd antenna
+	if len(tag.RSSIWindow) < WindowSize {
+		return false // Not enough data
+	}
+
+	maxVal := tag.RSSIWindow[0].PeakRssi
+	maxIndex := 0
+
+	for i, entry := range tag.RSSIWindow {
+		if entry.PeakRssi >= maxVal {
+			maxVal = entry.PeakRssi
+			maxIndex = i
+		}
+	}
+
+	// Ensure a significant drop after the peak
+	if maxIndex < len(tag.RSSIWindow)-1 {
+		if maxVal-tag.RSSIWindow[maxIndex+1].PeakRssi >= PeakDropThreshold {
+			tag.Endtime = tag.RSSIWindow[maxIndex].FirstSeenTimestamp // Update end time
+			return true
+		}
+	}
+
+	return false
 }
 
 func (tag *Tag) handleData() {
@@ -73,7 +135,7 @@ func (tag *Tag) handleData() {
 	for {
 		select {
 		case data := <-tag.ChDataFromReader:
-			// print("initial len(tag.Data)", len(tag.Data))
+			// fmt.Println("data len=", len(tag.Data), data)
 			if (len(tag.Data) == 0) && (data.AntennaPort == 17) {
 				tag.AddPortFlag = true
 				fmt.Println("Antenna 17 active", tag.AddPortFlag)
@@ -82,27 +144,25 @@ func (tag *Tag) handleData() {
 			}
 			if data.AntennaPort == 17 && tag.AddPortFlag {
 				tag.Data = append(tag.Data, data)
-				// fmt.Println("==17 port adding", tag.Data)
 			}
 			if data.AntennaPort == 9 && tag.AddPortFlag {
 				tag.Data = append(tag.Data, data)
-				// fmt.Println("==9 port adding", tag.Data, len(tag.countPortNumType()))
 				if len(tag.countPortNumType()) > 1 {
-					maxIndex, meanPower := tag.maxIndexPower()
-					tag.MeanPower = meanPower
-					fmt.Println("==9 port adding before clean, should see 2 ports", tag.Data, len(tag.countPortNumType()))
-					fmt.Println("meanPower", meanPower)
+					tag.maxIndexPower()
 
 					tag.Dist = Distance
 
-					tag.Starttime = tag.Data[maxIndex].FirstSeenTimestamp
+					// tag.Starttime = tag.Data[maxIndex].FirstSeenTimestamp
 					fmt.Println("tag.Starttime", tag.Starttime)
 					tag.Data = []RFIDData{}
-
+					tag.RSSIWindow = []RSSIEntry{} // clear window for the second antenna
 				}
-				if data.PeakRssi > tag.MeanPower {
+
+				tag.updateWindow(data)
+				if tag.detectLastPeak() {
 					timeEnd := data.FirstSeenTimestamp
 					fmt.Println("timeEnd", timeEnd)
+					fmt.Println("tag.Endtime", tag.Endtime)
 					timeDiff := float64(timeEnd-tag.Starttime) / 1000000
 					speed := float64(Distance / timeDiff)
 					speed = math.Round(speed*1000) / 1000
@@ -112,8 +172,13 @@ func (tag *Tag) handleData() {
 					tag.LED = "RED"
 					ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.Dist}
 					fmt.Println("speed:", tag.EPC, speed, Distance, timeDiff, timeEnd)
-					tag.Data = []RFIDData{}
 
+					// reset all values
+					tag.Data = []RFIDData{}
+					tag.RSSIWindow = []RSSIEntry{}
+					tag.Starttime = 0
+					tag.Endtime = 0
+					timeEnd = 0
 					tag.AddPortFlag = false
 					go func() {
 						time.Sleep(time.Duration(timeDiff) * time.Second)
