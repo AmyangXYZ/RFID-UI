@@ -32,8 +32,8 @@ const handleClose = (key: string, keyPath: string[]) => {
           {{
             tag.epc
           }}
-          <p v-if="tag.led === 'GREY'">SLEEPING</p>
-          <p v-if="tag.led === 'GREEN'">ACTIVE</p>
+          <p v-if="tag.led === 'GREY'">ACTIVE</p>
+          <p v-if="tag.led === 'GREEN'">RECORDING</p>
           <p v-if="tag.led === 'RED'">HOLD</p> 
           <!-- <button @click="deleteTag(tags[index].epc24)" class="Button">Delete</button> -->
         </ol>
