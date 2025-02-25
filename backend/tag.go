@@ -135,10 +135,8 @@ func (tag *Tag) handleData() {
 	for {
 		select {
 		case data := <-tag.ChDataFromReader:
-			// fmt.Println("data len=", len(tag.Data), data)
 			if (len(tag.Data) == 0) && (data.AntennaPort == 17) {
 				tag.AddPortFlag = true
-				fmt.Println("Antenna 17 active", tag.AddPortFlag)
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
 				tag.LED = "GREEN"
 			}
@@ -149,10 +147,7 @@ func (tag *Tag) handleData() {
 				tag.Data = append(tag.Data, data)
 				if len(tag.countPortNumType()) > 1 {
 					tag.maxIndexPower()
-
 					tag.Dist = Distance
-
-					// tag.Starttime = tag.Data[maxIndex].FirstSeenTimestamp
 					fmt.Println("tag.Starttime", tag.Starttime)
 					tag.Data = []RFIDData{}
 					tag.RSSIWindow = []RSSIEntry{} // clear window for the second antenna
@@ -171,7 +166,7 @@ func (tag *Tag) handleData() {
 					ChLEDToUI <- LEDServerToUI{tag.EPC, "RED"}
 					tag.LED = "RED"
 					ChDataToUI <- DataServerToUI{tag.EPC, speed, timeText, tag.Dist}
-					fmt.Println("speed:", tag.EPC, speed, Distance, timeDiff, timeEnd)
+					fmt.Println("speed:", tag.EPC, speed, Distance, timeDiff)
 
 					// reset all values
 					tag.Data = []RFIDData{}
