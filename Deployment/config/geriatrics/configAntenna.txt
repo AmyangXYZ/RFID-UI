@@ -1,0 +1,3 @@
+#reader port numner (Geriatrics office)
+ANTENNA1:17;
+ANTENNA2:9;

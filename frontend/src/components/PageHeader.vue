@@ -37,9 +37,9 @@ const handleSelect = (key: string, keyPath: string[]) => {
         meters
         <button @click="enterDistance(boxinput)" >Update</button>
       </p> -->
-      <p>Reader Name: SpeedwayR-14-D3-31</p>
-      <p>Rx Sensitivity: -50</p>
-      <p>Tx Power: 15</p>
+      <!-- <p>Reader Name: SpeedwayR-14-D3-31</p> -->
+      <!-- <p>Rx Sensitivity: -50</p> -->
+      <!-- <p>Tx Power: 15</p> -->
    
 
     </el-sub-menu>

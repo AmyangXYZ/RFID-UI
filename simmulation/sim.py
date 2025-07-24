@@ -42,7 +42,9 @@ def send_to_server(rfid_data_list, server_url):
     return response.status_code, response.text
 
 if __name__ == "__main__":
-    file_path = "rfiddata/data16.txt"  # Update with the correct path if needed
+    # file_path = "rfiddata/geriatrics/02042025/data14.txt"
+    file_path = "rfiddata/southington/07212025/data1.txt"  # Update with the correct path if needed
+
     server_endpoint = "http://localhost:16311/api/reader/connect"  # Adjust if the server runs on a different host
     
     rfid_data = extract_rfid_data(file_path)

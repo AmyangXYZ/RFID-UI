@@ -1,0 +1,3 @@
+#reader port numner (Southlinton office)
+ANTENNA1:3;
+ANTENNA2:2;

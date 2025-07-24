@@ -135,15 +135,17 @@ func (tag *Tag) handleData() {
 	for {
 		select {
 		case data := <-tag.ChDataFromReader:
-			if (len(tag.Data) == 0) && (data.AntennaPort == 17) {
+			if (len(tag.Data) == 0) && (data.AntennaPort == ANTENNA1) {
+
 				tag.AddPortFlag = true
 				ChLEDToUI <- LEDServerToUI{tag.EPC, "GREEN"}
 				tag.LED = "GREEN"
 			}
-			if data.AntennaPort == 17 && tag.AddPortFlag {
+			if data.AntennaPort == ANTENNA1 && tag.AddPortFlag {
 				tag.Data = append(tag.Data, data)
 			}
-			if data.AntennaPort == 9 && tag.AddPortFlag {
+			if data.AntennaPort == ANTENNA2 && tag.AddPortFlag {
+
 				tag.Data = append(tag.Data, data)
 				if len(tag.countPortNumType()) > 1 {
 					tag.maxIndexPower()

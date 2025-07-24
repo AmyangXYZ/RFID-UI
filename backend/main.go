@@ -22,20 +22,88 @@ var (
 		WriteBufferSize: 1024,
 	}
 	TagHolder          = make(map[string]*Tag)
-	Distance   float64 = readDistanceFromFile("distconfig.txt") //unit m
+	Distance   float64 = readDistanceFromFile("configDist.txt") //unit m
 	ChDataToUI         = make(chan DataServerToUI, 1024)
 	ChLEDToUI          = make(chan LEDServerToUI, 1024)
 	ChBreak            = make(chan bool, 1024)
-
-	// TagList = []string{"E28068940000401D6E135DC6", "E28068940000501D6E13EDC6", "E28068940000401D6E13B5C6", "E28068940000401D6E136DC6", "000000000000000018145536"}
-	TagList = map[string]string{
-		"Tag1": "E28068940000401D6E135DC6",
-		"Tag2": "E28068940000501D6E13EDC6",
-		"Tag3": "E28068940000401D6E13B5C6",
-		"Tag4": "E28068940000401D6E136DC6",
-		"Tag5": "000000000000000000001088",
-	}
+	TagList            = readTagListFromFile("configTags.txt")
+	ANTENNA1   int     = readAntennaFromFile("ANTENNA1")
+	ANTENNA2   int     = readAntennaFromFile("ANTENNA2")
 )
+
+// Read antenna value from antennaconfig.txt file
+func readAntennaFromFile(antennaName string) int {
+	file, err := os.Open("configAntenna.txt")
+	if err != nil {
+		fmt.Printf("Error opening antenna config file: %v\n", err)
+		return 0
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue // skip empty lines or comments
+		}
+
+		// Remove trailing semicolon if present
+		line = strings.TrimSuffix(line, ";")
+		parts := strings.SplitN(line, ":", 2)
+
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			valueStr := strings.TrimSpace(parts[1])
+
+			// Check if this is the antenna we're looking for
+			if key == antennaName {
+				if value, err := strconv.Atoi(valueStr); err == nil {
+					fmt.Printf("Found %s: %d\n", antennaName, value)
+					return value
+				} else {
+					fmt.Printf("Error parsing antenna value for %s: %v\n", antennaName, err)
+					return 0
+				}
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("Error reading antenna config file: %v\n", err)
+	}
+
+	fmt.Printf("Antenna %s not found in config file\n", antennaName)
+	return 0
+}
+
+// Read tag list from a config file with format: TagName: TagValue;
+func readTagListFromFile(filepath string) map[string]string {
+	tagMap := make(map[string]string)
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println("Error opening tag file:", err)
+		return tagMap
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue // skip empty lines or comments
+		}
+		// Remove trailing semicolon if present
+		line = strings.TrimSuffix(line, ";")
+		parts := strings.SplitN(line, ":", 2)
+		if len(parts) == 2 {
+			tagMap[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading tag file:", err)
+	}
+	return tagMap
+}
 
 // hard coded tags
 
@@ -183,6 +251,7 @@ func readDistanceFromFile(filepath string) float64 {
 
 			// Extract and convert the value to a float
 			distanceStr := strings.TrimSpace(parts[1])
+			distanceStr = strings.TrimSuffix(distanceStr, ";")
 			distance, err := strconv.ParseFloat(distanceStr, 64)
 			if err != nil {
 				return 0
@@ -201,7 +270,6 @@ func readDistanceFromFile(filepath string) float64 {
 
 func GetWebSocket(ctx *sgo.Context) error {
 	fmt.Println("RFID ready to run ")
-
 	ws, err := upgrader.Upgrade(ctx.Resp, ctx.Req, nil)
 	breakSig := make(chan bool)
 	if err != nil {
